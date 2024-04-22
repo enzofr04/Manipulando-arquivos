@@ -39,7 +39,7 @@ int lerAlunos(Aluno alunos[]) {
     FILE *arquivo;
     char linha[1024];
     int num_alunos = 0;
-    int primeira_linha = 1; // Flag para indicar se é a primeira linha
+    int primeira_linha = 1;
 
     arquivo = fopen("DadosEntrada.csv", "r");
     if (arquivo == NULL) {
@@ -48,10 +48,10 @@ int lerAlunos(Aluno alunos[]) {
     }
 
     while (fgets(linha, sizeof(linha), arquivo) != NULL) {
-        // Ignora a primeira linha
+
         if (primeira_linha) {
-            primeira_linha = 0; // Desativa a flag após a primeira linha
-            continue; // Pula para a próxima iteração do loop
+            primeira_linha = 0;
+            continue;
         }
 
         char *token;
