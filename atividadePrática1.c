@@ -17,7 +17,8 @@ typedef struct {
 } Aluno;
 
 int lerAlunos(Aluno alunos[]);
-
+void calcularMediaSituacao(Aluno *aluno);
+void salvarSituacaoFinal(Aluno alunos[], int num_alunos);
 
 int main() {
     Aluno alunos[MAX_ALUNOS];
@@ -25,6 +26,11 @@ int main() {
 
     num_alunos = lerAlunos(alunos);
 
+    for (int i = 0; i < num_alunos; i++) {
+        calcularMediaSituacao(&alunos[i]);
+    }
+
+    salvarSituacaoFinal(alunos, num_alunos);
 
     return 0;
 }
@@ -33,6 +39,7 @@ int lerAlunos(Aluno alunos[]) {
     FILE *arquivo;
     char linha[1024];
     int num_alunos = 0;
+    int primeira_linha = 1; // Flag para indicar se é a primeira linha
 
     arquivo = fopen("DadosEntrada.csv", "r");
     if (arquivo == NULL) {
@@ -41,6 +48,12 @@ int lerAlunos(Aluno alunos[]) {
     }
 
     while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+        // Ignora a primeira linha
+        if (primeira_linha) {
+            primeira_linha = 0; // Desativa a flag após a primeira linha
+            continue; // Pula para a próxima iteração do loop
+        }
+
         char *token;
         token = strtok(linha, ",");
         strcpy(alunos[num_alunos].nome, token);
@@ -63,4 +76,30 @@ int lerAlunos(Aluno alunos[]) {
 
     return num_alunos;
 }
+void calcularMediaSituacao(Aluno *aluno) {
+    float soma = 0;
+    for (int i = 0; i < aluno->num_notas; i++) {
+        soma += aluno->notas[i];
+    }
+    aluno->media = soma / aluno->num_notas;
+    if (aluno->media >= 7.0) {
+        strcpy(aluno->situacao, "APROVADO");
+    } else {
+        strcpy(aluno->situacao, "REPROVADO");
+    }
+}
 
+void salvarSituacaoFinal(Aluno alunos[], int num_alunos) {
+    FILE *arquivo;
+    arquivo = fopen("SituacaoFinal.csv", "w");
+    if (arquivo == NULL) {
+        printf("Erro ao criar o arquivo de saída.\n");
+        exit(1);
+    }
+
+    for (int i = 0; i < num_alunos; i++) {
+        fprintf(arquivo, "%s, %.2f, %s\n", alunos[i].nome, alunos[i].media, alunos[i].situacao);
+    }
+
+    fclose(arquivo);
+}
